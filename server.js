@@ -31,32 +31,52 @@ app.get("/albums/:id", (req, res) => {
   res.status(200).send(idAlbum);
 });
 app.post("/albums", (req, res) => {
-    console.log(req.body);
-    const newObj = {
-      albumId: newID(),
-      artistName: req.body.artistName,
-      collectionName: req.body.collectionName,
-      artworkUrl100: req.body.artworkUrl100,
-      releaseDate: req.body.releaseDate,
-      primaryGenreName: req.body.primaryGenreName,
-      url: req.body.url,
-    }; 
-    console.log(newObj)
-    albumsData.push(newObj)
-    res.sendStatus(201).send("Created")
-})
+  console.log(req.body);
+  const newObj = {
+    albumId: newID(),
+    artistName: req.body.artistName,
+    collectionName: req.body.collectionName,
+    artworkUrl100: req.body.artworkUrl100,
+    releaseDate: req.body.releaseDate,
+    primaryGenreName: req.body.primaryGenreName,
+    url: req.body.url,
+  };
+  console.log(newObj);
+  albumsData.push(newObj);
+  res.sendStatus(201).send("Created");
+});
 app.delete("/albums/:id", (req, res) => {
+  let idUpdate = req.params.id;
   // find album and make sure it's there => use findIndex method to get the index
+  let idIndex = albumsData.findIndex((album) => album.albumId === idUpdate);
   // if not there (index === -1) => 404 not found
+  if (idIndex > -1) {
+    albumsData.splice(idIndex, 1);
+    res.send(albumsData).sendStatus(204);
+  } else {
+    res.status(404).send("Not Found");
+  }
   // if is there => use splice(index, 1) to remove the element at index
   // response.sendStatus(204)
 });
 app.put("/albums/:id", (req, res) => {
+  let idUpdate = req.params.id;
+  let updatedAlbum = req.body;
   // find album (and make sure it's there) => use findIndex method to get the index
+  let idIndex = albumsData.findIndex((album) => album.albumId === idUpdate);
   // if not there (index === -1) => 404 not found
   // updatedAlbum = req.body
   // (optionally) check that the albumId of updatedAlbum is correct
   // albumsData[index] = updatedAlbum
   // reponse.sendStatus(204)
+  if (idUpdate != Number(updatedAlbum.albumId)){
+    res.sendStatus(400).send("Please id in URL should match id you want to update")
+  }else if (idIndex > -1 ) {
+    console.log("djfvh");
+    albumsData[idIndex] = updatedAlbum;
+    res.send(albumsData).sendStatus(204);
+  } else {
+    res.status(404).send("Not Found");
+  }
 });
 app.listen(SERVER_PORT, () => console.log(`Server running on ${SERVER_PORT}`));
